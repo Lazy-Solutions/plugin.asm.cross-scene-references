@@ -1,0 +1,21 @@
+{
+  "name": "plugin.asm.cross-scene-references",
+  "version": "1.0.0",
+  "displayName": "[Experimental] Cross-scene References",
+  "changeLogUrl": "https://assetstore.unity.com/packages/tools/utilities/advanced-scene-manager-174152#releases",
+  "documentationUrl": "https://github.com/Lazy-Solutions/advanced-scene-manager",
+  "description": "This package provides cross-scene references to Advanced Scene Manager.",
+  "unity": "2019.1",
+  "keywords": [
+    "asm",
+    "advanced",
+    "scene",
+    "manager"
+  ],
+  "author": {
+    "name": "Advanced Scene Manager",
+    "email": "support@lazy.solutions",
+    "url": "http://lazy.solutions/"
+  },
+  "type": "tool"
+}

@@ -1,0 +1,18 @@
+{
+    "name": "plugin.asm.cross-scene-references",
+    "references": [
+        "GUID:2c6f01f5d27984343bd2e98e1116e8fd",
+        "GUID:9355a63df021cf44fae09ac3609dd085"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "ASM"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
