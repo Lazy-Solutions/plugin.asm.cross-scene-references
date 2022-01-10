@@ -14,4 +14,4 @@ Through the experiments section in Advanced Scene Manager settings, this is the 
 Otherwise you may install it like a regular git package.\
 https://github.com/Lazy-Solutions/plugin.asm.cross-scene-references.git
 
-![](https://github.com/Lazy-Solutions/plugin.asm.locking/blob/main/Image/git-package-menu.png)
+![](https://github.com/Lazy-Solutions/plugin.asm.package-manager/blob/main/image/git-package-menu.png)

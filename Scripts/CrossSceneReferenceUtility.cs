@@ -14,7 +14,6 @@ using AdvancedSceneManager.Models;
 using scene = UnityEngine.SceneManagement.Scene;
 using Object = UnityEngine.Object;
 using Debug = UnityEngine.Debug;
-using System.ComponentModel;
 using Component = UnityEngine.Component;
 using UnityEngine.UIElements;
 using Lazy.Utility;
@@ -703,6 +702,7 @@ namespace plugin.asm.crossSceneReferences
             EditorSceneManager.sceneOpened -= EditorSceneManager_sceneOpening;
             EditorSceneManager.sceneClosed -= EditorSceneManager_sceneClosed;
             SceneOperation.RestoreCrossSceneReferencesCallback -= RestoreCrossSceneReferences;
+            CrossSceneReferenceUtilityProxy.clearScene -= ClearScene;
 
             HierarchyGUIUtility.RemoveSceneGUI(OnSceneGUI);
             HierarchyGUIUtility.RemoveGameObjectGUI(OnGameObjectGUI);
@@ -731,6 +731,7 @@ namespace plugin.asm.crossSceneReferences
             EditorSceneManager.sceneClosed += EditorSceneManager_sceneClosed;
             BuildEventsUtility.preBuild += BuildEventsUtility_preBuild;
             SceneOperation.RestoreCrossSceneReferencesCallback += RestoreCrossSceneReferences;
+            CrossSceneReferenceUtilityProxy.clearScene += ClearScene;
 
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
 
