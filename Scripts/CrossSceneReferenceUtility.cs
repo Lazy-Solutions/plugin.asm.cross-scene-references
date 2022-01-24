@@ -1,4 +1,4 @@
-﻿#pragma warning disable IDE0051 // Remove unused private members
+#pragma warning disable IDE0051 // Remove unused private members
 #pragma warning disable IDE0062 // Make local function 'static'
 
 using System;
@@ -43,6 +43,12 @@ namespace plugin.asm.crossSceneReferences
 
         #region SceneOperation
 
+        static readonly Callback sceneOperationCallback = Callback.Before(Phase.OpenCallbacks).Do(RestoreCrossSceneReferences);
+
+        [RuntimeInitializeOnLoadMethod]
+        static void OnLoadRuntime() =>
+            SceneOperation.AddCallback(sceneOperationCallback);
+
         static IEnumerator RestoreCrossSceneReferences()
         {
 
@@ -50,6 +56,9 @@ namespace plugin.asm.crossSceneReferences
             var i = 0;
             while (e.MoveNext())
             {
+
+                Debug.Log(e.Current.name + ": " + e.Current.isLoaded);
+
                 var e1 = RestoreCrossSceneReferencesWithWarnings_IEnumerator(e.Current, respectSettingsSuppressingWarnings: true);
                 while (e1.MoveNext())
                 {
@@ -262,8 +271,10 @@ namespace plugin.asm.crossSceneReferences
             /// <summary>Adds data about an unity event.</summary>
             public ObjectReference With(int? unityEventIndex = null, int? arrayIndex = null)
             {
-                if (unityEventIndex.HasValue) this.unityEventIndex = unityEventIndex.Value;
-                if (arrayIndex.HasValue) this.arrayIndex = arrayIndex.Value;
+                if (unityEventIndex.HasValue)
+                    this.unityEventIndex = unityEventIndex.Value;
+                if (arrayIndex.HasValue)
+                    this.arrayIndex = arrayIndex.Value;
                 return this;
             }
 
@@ -556,6 +567,8 @@ namespace plugin.asm.crossSceneReferences
 
         #endregion
 
+        #region Editor
+
 #if UNITY_EDITOR
 
         #region Reference status
@@ -701,7 +714,9 @@ namespace plugin.asm.crossSceneReferences
             EditorSceneManager.sceneSaved -= EditorSceneManager_sceneSaved;
             EditorSceneManager.sceneOpened -= EditorSceneManager_sceneOpening;
             EditorSceneManager.sceneClosed -= EditorSceneManager_sceneClosed;
-            SceneOperation.RestoreCrossSceneReferencesCallback -= RestoreCrossSceneReferences;
+
+            SceneOperation.RemoveCallback(sceneOperationCallback);
+
             CrossSceneReferenceUtilityProxy.clearScene -= ClearScene;
 
             HierarchyGUIUtility.RemoveSceneGUI(OnSceneGUI);
@@ -713,6 +728,9 @@ namespace plugin.asm.crossSceneReferences
         static bool isInitialized;
         static void Initialize(bool restoreScenes = false)
         {
+
+            if (Application.isPlaying)
+                return;
 
             if (isInitialized)
                 return;
@@ -730,7 +748,9 @@ namespace plugin.asm.crossSceneReferences
             EditorSceneManager.sceneOpened += EditorSceneManager_sceneOpening;
             EditorSceneManager.sceneClosed += EditorSceneManager_sceneClosed;
             BuildEventsUtility.preBuild += BuildEventsUtility_preBuild;
-            SceneOperation.RestoreCrossSceneReferencesCallback += RestoreCrossSceneReferences;
+
+            SceneOperation.AddCallback(sceneOperationCallback);
+
             CrossSceneReferenceUtilityProxy.clearScene += ClearScene;
 
             EditorApplication.playModeStateChanged += OnPlayModeChanged;
@@ -863,6 +883,20 @@ namespace plugin.asm.crossSceneReferences
         private static void EditorSceneManager_sceneSaved(scene scene) =>
             RestoreScenes();
 
+        /// <summary>Clears all added cross-scene references in scene, to prevent warning when saving.</summary>
+        public static void ClearScene(scene scene)
+        {
+
+            if (Load(scene.path) is SceneCrossSceneReferenceCollection references)
+                foreach (var variable in references.references.OfType<CrossSceneReference>().ToArray())
+                    variable.variable.SetValue(null, out _, out _, forceHierarchyScan: true, setValueIfNull: true);
+
+#if UNITY_EDITOR
+            SetSceneStatus(scene, SceneStatus.Cleared);
+#endif
+
+        }
+
         #endregion
         #region Find
 
@@ -965,6 +999,7 @@ namespace plugin.asm.crossSceneReferences
         #endregion
 
 #endif
+        #endregion
 
         static IEnumerable<FieldInfo> GetFields(Type type)
         {
@@ -985,20 +1020,6 @@ namespace plugin.asm.crossSceneReferences
                 if (e.Current.Name == name)
                     return e.Current;
             return null;
-        }
-
-        /// <summary>Clears all added cross-scene references in scene, to prevent warning when saving.</summary>
-        public static void ClearScene(scene scene)
-        {
-
-            if (Load(scene.path) is SceneCrossSceneReferenceCollection references)
-                foreach (var variable in references.references.OfType<CrossSceneReference>().ToArray())
-                    variable.variable.SetValue(null, out _, out _, forceHierarchyScan: true, setValueIfNull: true);
-
-#if UNITY_EDITOR
-            SetSceneStatus(scene, SceneStatus.Cleared);
-#endif
-
         }
 
         /// <summary>Restores cross-scene references in the scene.</summary>
@@ -1042,6 +1063,7 @@ namespace plugin.asm.crossSceneReferences
             if (!scene.isLoaded)
                 yield break;
 
+            Debug.Log("restoring cross scene references");
             var e = RestoreWithInfo(scene, forceHierarchyScan).GetEnumerator();
             var i = 0;
             while (e.MoveNext())
