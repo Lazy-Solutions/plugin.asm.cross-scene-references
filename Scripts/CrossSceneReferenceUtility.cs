@@ -57,8 +57,6 @@ namespace plugin.asm.crossSceneReferences
             while (e.MoveNext())
             {
 
-                Debug.Log(e.Current.name + ": " + e.Current.isLoaded);
-
                 var e1 = RestoreCrossSceneReferencesWithWarnings_IEnumerator(e.Current, respectSettingsSuppressingWarnings: true);
                 while (e1.MoveNext())
                 {
