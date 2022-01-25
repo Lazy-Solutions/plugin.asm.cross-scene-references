@@ -1,13 +1,12 @@
 ﻿#if UNITY_EDITOR
 
+using System.IO;
 using AdvancedSceneManager.Editor.Utility;
 using AdvancedSceneManager.Utility;
-using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
-using static plugin.asm.crossSceneReferences.CrossSceneReferenceUtility;
 using scene = UnityEngine.SceneManagement.Scene;
 
 namespace plugin.asm.crossSceneReferences
@@ -16,10 +15,8 @@ namespace plugin.asm.crossSceneReferences
     public class CrossSceneDebugger : EditorWindow
     {
 
-        //TODO: Add not enabled message
-
         [SerializeField] private SerializableStringBoolDict expanded = new SerializableStringBoolDict();
-        SceneCrossSceneReferenceCollection[] references;
+        CrossSceneReferenceCollection[] references;
 
         [MenuItem("Tools/Advanced Scene Manager/Window/Cross-scene reference debugger", priority = 52)]
         public static void Open()
@@ -37,7 +34,7 @@ namespace plugin.asm.crossSceneReferences
         {
 
             Editor_OnSaved();
-            OnSaved += Editor_OnSaved;
+            CrossSceneReferenceUtility.OnSaved += Editor_OnSaved;
 
             //Load variables from editor prefs
             var json = EditorPrefs.GetString("AdvancedSceneManager.CrossSceneDebugger", JsonUtility.ToJson(this));
@@ -45,15 +42,13 @@ namespace plugin.asm.crossSceneReferences
 
         }
 
-        void OnFocus()
-        {
+        void OnFocus() =>
             Editor_OnSaved();
-        }
 
         void OnDisable()
         {
 
-            OnSaved -= Editor_OnSaved;
+            CrossSceneReferenceUtility.OnSaved -= Editor_OnSaved;
 
             //Save variables to editor prefs
             var json = JsonUtility.ToJson(this);
@@ -63,7 +58,7 @@ namespace plugin.asm.crossSceneReferences
 
         void Editor_OnSaved()
         {
-            references = Enumerate();
+            references = CrossSceneReferenceUtility.Enumerate();
             Repaint();
         }
 
@@ -78,16 +73,16 @@ namespace plugin.asm.crossSceneReferences
         static VisualElement ShowUnresolvedReferencesIcon()
         {
             var toggle = new Toggle("Unable to resolve cross-scene reference:") { tooltip = "Log a warning, or error if build, when a cross-scene reference could not be resolved (PlayerPrefs)." };
-            toggle.SetValueWithoutNotify(unableToResolveCrossSceneReferencesWarning);
-            _ = toggle.RegisterValueChangedCallback(e => unableToResolveCrossSceneReferencesWarning = e.newValue);
+            toggle.SetValueWithoutNotify(CrossSceneReferenceUtility.unableToResolveCrossSceneReferencesWarning);
+            _ = toggle.RegisterValueChangedCallback(e => CrossSceneReferenceUtility.unableToResolveCrossSceneReferencesWarning = e.newValue);
             return toggle;
         }
 
         static VisualElement LogUnresolvedReferences()
         {
             var toggle = new Toggle("Log when a reference is unable to be resolved:");
-            toggle.SetValueWithoutNotify(unableToResolveCrossSceneReferencesWarning);
-            _ = toggle.RegisterValueChangedCallback(e => unableToResolveCrossSceneReferencesWarning = e.newValue);
+            toggle.SetValueWithoutNotify(CrossSceneReferenceUtility.unableToResolveCrossSceneReferencesWarning);
+            _ = toggle.RegisterValueChangedCallback(e => CrossSceneReferenceUtility.unableToResolveCrossSceneReferencesWarning = e.newValue);
             return toggle;
         }
 
@@ -100,7 +95,7 @@ namespace plugin.asm.crossSceneReferences
 
             scrollPos = EditorGUILayout.BeginScrollView(scrollPos);
 
-            EditorGUILayout.BeginVertical(new GUIStyle() { margin = new RectOffset(64, 64, 42, 42) });
+            _ = EditorGUILayout.BeginVertical(new GUIStyle() { margin = new RectOffset(64, 64, 42, 42) });
             if (references != null)
                 foreach (var scene in references)
                 {
@@ -129,7 +124,7 @@ namespace plugin.asm.crossSceneReferences
             r = new Rect(r.xMax - 22, r.y - 18, 22, 22);
             if (GUI.Button(r, new GUIContent("x", "Remove")))
             {
-                Remove(reference);
+                CrossSceneReferenceUtility.Remove(reference);
                 Editor_OnSaved();
             }
 
