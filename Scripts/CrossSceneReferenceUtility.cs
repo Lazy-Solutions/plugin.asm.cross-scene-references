@@ -1061,7 +1061,6 @@ namespace plugin.asm.crossSceneReferences
             if (!scene.isLoaded)
                 yield break;
 
-            Debug.Log("restoring cross scene references");
             var e = RestoreWithInfo(scene, forceHierarchyScan).GetEnumerator();
             var i = 0;
             while (e.MoveNext())
