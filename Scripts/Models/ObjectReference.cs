@@ -219,9 +219,15 @@ namespace plugin.asm.crossSceneReferences
         void SetPersistentListener(UnityEvent ev, Object value, ref FailReason reasonForFailure)
         {
 
-            var persistentCallsField = typeof(UnityEvent).GetFields().FirstOrDefault(f => f.Name == "m_PersistentCalls");
-            FieldInfo CallsField(object o) => o.GetType().GetFields().FirstOrDefault(f => f.Name == "m_Calls");
-            FieldInfo TargetField(object o) => o.GetType().GetFields().FirstOrDefault(f => f.Name == "m_Target");
+            var persistentCallsField = typeof(UnityEvent)._GetFields().FirstOrDefault(f => f.Name == "m_PersistentCalls");
+            FieldInfo CallsField(object o) => o.GetType()._GetFields().FirstOrDefault(f => f.Name == "m_Calls");
+            FieldInfo TargetField(object o) => o.GetType()._GetFields().FirstOrDefault(f => f.Name == "m_Target");
+
+            if (persistentCallsField is null)
+            {
+                Debug.LogError("Cross-scene utility: Could not find field for setting UnityEvent listener.");
+                return;
+            }
 
             var persistentCallGroup = persistentCallsField.GetValue(ev);
             var calls = CallsField(persistentCallGroup).GetValue(persistentCallGroup);

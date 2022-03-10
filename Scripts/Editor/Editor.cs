@@ -1,18 +1,17 @@
 ﻿#if UNITY_EDITOR
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using AdvancedSceneManager.Editor.Utility;
 using AdvancedSceneManager.Models;
 using AdvancedSceneManager.Utility;
 using Lazy.Utility;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEditor.Callbacks;
 using UnityEditor.SceneManagement;
 using UnityEngine;
 using UnityEngine.UIElements;
-
 using scene = UnityEngine.SceneManagement.Scene;
 
 namespace plugin.asm.crossSceneReferences
@@ -136,8 +135,8 @@ namespace plugin.asm.crossSceneReferences
         static void Initialize(bool restoreScenes = false)
         {
 
-            if (Application.isPlaying)
-                return;
+            //if (Application.isPlaying)
+            //    return;
 
             if (isInitialized)
                 return;

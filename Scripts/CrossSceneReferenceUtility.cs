@@ -281,17 +281,17 @@ namespace plugin.asm.crossSceneReferences
         #region Find
 
         /// <summary>Finds all cross-scene references in the scenes.</summary>
-        public static CrossSceneReference[] FindCrossSceneReferences(params scene[] scenes)
+        public static IEnumerable<CrossSceneReference> FindCrossSceneReferences(params scene[] scenes)
         {
-
-            var l = new List<CrossSceneReference>();
 
             var components = FindComponents(scenes).
                 Where(s => s.obj && s.scene.IsValid()).
-                Select(c => (c.scene, c.obj, fields: c.obj.GetType().GetFields().Where(IsSerialized).ToArray())).
+                Select(c => (c.scene, c.obj, fields: c.obj.GetType()._GetFields().Where(IsSerialized).ToArray())).
                 ToArray();
 
             foreach (var (scene, obj, fields) in components)
+            {
+
                 foreach (var field in fields.ToArray())
                 {
 
@@ -307,7 +307,7 @@ namespace plugin.asm.crossSceneReferences
                                 if (GetCrossSceneReference(o, scene, out var reference, unityEventIndex: i))
                                 {
                                     var source = GetSourceCrossSceneReference(scene, obj, field, unityEventIndex: i);
-                                    l.Add(new CrossSceneReference(source, reference));
+                                    yield return new CrossSceneReference(source, reference);
                                 }
                             }
                         }
@@ -318,19 +318,17 @@ namespace plugin.asm.crossSceneReferences
                                 if (GetCrossSceneReference(o, scene, out var reference, arrayIndex: i))
                                 {
                                     var source = GetSourceCrossSceneReference(scene, obj, field, arrayIndex: i);
-                                    l.Add(new CrossSceneReference(source, reference));
+                                    yield return new CrossSceneReference(source, reference);
                                 }
                             }
                         }
                         else if (GetCrossSceneReference(o, scene, out var reference))
-                            l.Add(new CrossSceneReference(GetSourceCrossSceneReference(scene, obj, field), reference));
+                            yield return new CrossSceneReference(GetSourceCrossSceneReference(scene, obj, field), reference);
 
                     }
 
                 }
-
-            return l.ToArray();
-
+            }
         }
 
         static bool IsSerialized(FieldInfo field) =>
