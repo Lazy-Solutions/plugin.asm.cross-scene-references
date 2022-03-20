@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 
-using System.IO;
 using AdvancedSceneManager.Editor.Utility;
 using AdvancedSceneManager.Utility;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -98,14 +98,34 @@ namespace plugin.asm.crossSceneReferences
             _ = EditorGUILayout.BeginVertical(new GUIStyle() { margin = new RectOffset(64, 64, 42, 42) });
             if (references != null)
                 foreach (var scene in references)
-                {
                     if (DrawHeader(scene.scene, Path.GetFileNameWithoutExtension(scene.scene)))
+                    {
+
+                        GUILayout.BeginHorizontal();
+                        GUILayout.FlexibleSpace();
+                        if (GUILayout.Button("Clear references in scene") && Prompt("Are you sure you want to clear references in '" + scene.scene + "'?"))
+                            ClearReferences(scene);
+                        GUILayout.EndHorizontal();
+
                         foreach (var item in scene.references)
                             Draw(item);
-                }
+
+                    }
+
             EditorGUILayout.EndVertical();
             EditorGUILayout.EndScrollView();
 
+        }
+
+        bool Prompt(string prompt) =>
+            !EditorUtility.DisplayDialog("", prompt, "cancel", "yes");
+
+        void ClearReferences(CrossSceneReferenceCollection scene)
+        {
+            CrossSceneReferenceUtility.ClearScene(EditorSceneManager.GetSceneByPath(scene.scene));
+            CrossSceneReferenceUtility.Remove(scene.scene);
+            OnEnable();
+            Repaint();
         }
 
         bool DrawHeader(string key, string header) =>
