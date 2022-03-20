@@ -384,12 +384,17 @@ namespace plugin.asm.crossSceneReferences
         {
 
             if (Load(scene.path) is CrossSceneReferenceCollection references)
-                foreach (var variable in references.references.OfType<CrossSceneReference>().ToArray())
-                    variable.variable.SetValue(null, out _, out _, forceHierarchyScan: true, setValueIfNull: true);
+                foreach (var reference in references.references.OfType<CrossSceneReference>().ToArray())
+                    ClearReference(reference);
 
             SetSceneStatus(scene, SceneStatus.Cleared);
 
         }
+
+        /// <summary>Clears the cross-scene reference in scene.</summary>
+        /// <remarks>Only available in editor.</remarks>
+        public static void ClearReference(CrossSceneReference reference) =>
+            _ = reference.variable.SetValue(null, out _, out _, forceHierarchyScan: true, setValueIfNull: true);
 
 #endif
 

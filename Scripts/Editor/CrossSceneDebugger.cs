@@ -144,6 +144,7 @@ namespace plugin.asm.crossSceneReferences
             r = new Rect(r.xMax - 22, r.y - 18, 22, 22);
             if (GUI.Button(r, new GUIContent("x", "Remove")))
             {
+                CrossSceneReferenceUtility.ClearReference(reference);
                 CrossSceneReferenceUtility.Remove(reference);
                 Editor_OnSaved();
             }
