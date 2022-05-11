@@ -33,7 +33,9 @@ namespace plugin.asm.crossSceneReferences
             set => PlayerPrefs.SetInt("AdvancedSceneManager.Warnings.unableToResolveCrossSceneReferences", value ? 1 : 0);
         }
 
+#pragma warning disable CS0067
         internal static event Action OnSaved;
+#pragma warning restore CS0067
 
         #region Reference status
 
