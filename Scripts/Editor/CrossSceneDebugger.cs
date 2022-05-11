@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
 
-using System.IO;
 using AdvancedSceneManager.Editor.Utility;
 using AdvancedSceneManager.Utility;
+using System.IO;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -66,8 +66,8 @@ namespace plugin.asm.crossSceneReferences
 
         static void InitializeSettings()
         {
-            SettingsTab.instance.Add(ShowUnresolvedReferencesIcon, SettingsTab.instance.DefaultHeaders.Appearance_Hierarchy);
-            SettingsTab.instance.Add(LogUnresolvedReferences, SettingsTab.instance.DefaultHeaders.Log);
+            SettingsTab.instance.Add(ShowUnresolvedReferencesIcon(), SettingsTab.instance.DefaultHeaders.Appearance_Hierarchy);
+            SettingsTab.instance.Add(LogUnresolvedReferences(), SettingsTab.instance.DefaultHeaders.Options_Log);
         }
 
         static VisualElement ShowUnresolvedReferencesIcon()
@@ -190,7 +190,7 @@ namespace plugin.asm.crossSceneReferences
         {
             if (scene.isLoaded)
             {
-                var succeeded = reference.GetTarget(out var c, out var fail, forceHierarchyScan: true);
+                var succeeded = reference.GetTarget(out var c, out var fail);
                 if (succeeded)
                 {
                     GUI.enabled = false;

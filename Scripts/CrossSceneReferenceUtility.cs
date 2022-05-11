@@ -181,7 +181,7 @@ namespace plugin.asm.crossSceneReferences
             RestoreWithInfo(scene).ToArray();
 
         /// <summary>Restores cross-scene references in the scene.</summary>
-        public static IEnumerable<((ObjectReference reference, Object obj, ObjectReference.FailReason result) variable, (ObjectReference reference, Object obj, ObjectReference.FailReason result) value)> RestoreWithInfo(scene scene, bool forceHierarchyScan = false)
+        public static IEnumerable<((ObjectReference reference, Object obj, ObjectReference.FailReason result) variable, (ObjectReference reference, Object obj, ObjectReference.FailReason result) value)> RestoreWithInfo(scene scene)
         {
 
             if (Load(scene.path) is CrossSceneReferenceCollection references)
@@ -191,10 +191,10 @@ namespace plugin.asm.crossSceneReferences
                     ObjectReference.FailReason variableFailReason;
                     Object target;
 
-                    if (variable.value.GetTarget(out var value, out var valueFailReason, forceHierarchyScan))
-                        _ = variable.variable.SetValue(value, out target, out variableFailReason, forceHierarchyScan);
+                    if (variable.value.GetTarget(out var value, out var valueFailReason))
+                        _ = variable.variable.SetValue(value, out target, out variableFailReason);
                     else
-                        _ = variable.variable.GetTarget(out target, out variableFailReason, forceHierarchyScan);
+                        _ = variable.variable.GetTarget(out target, out variableFailReason);
 
                     yield return ((variable.variable, target, variableFailReason), (variable.value, value, valueFailReason));
 
@@ -211,13 +211,13 @@ namespace plugin.asm.crossSceneReferences
         }
 
         /// <summary>Restores cross-scene references and logs any failures to the console.</summary>
-        public static IEnumerator RestoreCrossSceneReferencesWithWarnings_IEnumerator(scene scene, bool respectSettingsSuppressingWarnings = false, bool forceHierarchyScan = false)
+        public static IEnumerator RestoreCrossSceneReferencesWithWarnings_IEnumerator(scene scene, bool respectSettingsSuppressingWarnings = false)
         {
 
             if (!scene.isLoaded)
                 yield break;
 
-            var e = RestoreWithInfo(scene, forceHierarchyScan).GetEnumerator();
+            var e = RestoreWithInfo(scene).GetEnumerator();
             var i = 0;
             while (e.MoveNext())
             {
@@ -385,7 +385,7 @@ namespace plugin.asm.crossSceneReferences
 
             if (Load(scene.path) is CrossSceneReferenceCollection references)
                 foreach (var variable in references.references.OfType<CrossSceneReference>().ToArray())
-                    variable.variable.SetValue(null, out _, out _, forceHierarchyScan: true, setValueIfNull: true);
+                    variable.variable.SetValue(null, out _, out _, setValueIfNull: true);
 
             SetSceneStatus(scene, SceneStatus.Cleared);
 

@@ -81,12 +81,12 @@ namespace plugin.asm.crossSceneReferences
             Succeeded, Unknown, SceneIsNotOpen, InvalidObjectPath, ComponentNotFound, InvalidField, TypeMismatch
         }
 
-        public bool SetValue(object value, out Object target, out FailReason reasonForFailure, bool forceHierarchyScan, bool setValueIfNull = false)
+        public bool SetValue(object value, out Object target, out FailReason reasonForFailure, bool setValueIfNull = false)
         {
 
             target = null;
 
-            if (!GetTarget(out var obj, out reasonForFailure, forceHierarchyScan))
+            if (!GetTarget(out var obj, out reasonForFailure))
                 return false;
 
             if (!GetField(obj, out var field, ref reasonForFailure))
@@ -115,7 +115,7 @@ namespace plugin.asm.crossSceneReferences
 
         #region Get
 
-        public bool GetTarget(out Object component, out FailReason reasonForFailure, bool forceHierarchyScan)
+        public bool GetTarget(out Object component, out FailReason reasonForFailure)
         {
 
             component = null;
@@ -124,7 +124,7 @@ namespace plugin.asm.crossSceneReferences
             if (!GetScene(scene, out var _, ref reasonForFailure))
                 return false;
 
-            if (!GetObject(out var obj, ref reasonForFailure, forceHierarchyScan))
+            if (!GetObject(out var obj, ref reasonForFailure))
                 return false;
 
             reasonForFailure = FailReason.Succeeded;
@@ -149,10 +149,10 @@ namespace plugin.asm.crossSceneReferences
             return true;
         }
 
-        bool GetObject(out GameObject obj, ref FailReason fail, bool forceHierarchyScan)
+        bool GetObject(out GameObject obj, ref FailReason fail)
         {
 
-            if (GuidReferenceUtility.TryFindPersistent(objectID, out obj, forceHierarchyScan))
+            if (GuidReferenceUtility.TryFindPersistent(objectID, out obj))
                 return true;
 
             fail = FailReason.InvalidObjectPath;
@@ -272,10 +272,10 @@ namespace plugin.asm.crossSceneReferences
         #endregion
 
         /// <summary>Evaluates path and returns <see cref="FailReason.Succeeded"/> if target path is okay, otherwise <see cref="FailReason"/> will indicate why not.</summary>
-        public FailReason Evaluate(bool forceHierarchyScan = false)
+        public FailReason Evaluate()
         {
 
-            if (!GetTarget(out var obj, out FailReason reasonForFailure, forceHierarchyScan))
+            if (!GetTarget(out var obj, out FailReason reasonForFailure))
                 return reasonForFailure;
             if (!GetField(obj, out _, ref reasonForFailure))
                 return reasonForFailure;

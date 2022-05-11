@@ -22,7 +22,7 @@ namespace plugin.asm.crossSceneReferences
 
         [InitializeOnLoadMethod]
         static void OnLoad() =>
-            SettingsTab.instance.Add(header: SettingsTab.instance.DefaultHeaders.Appearance_Hierarchy, callback: ShowHierarchyIconToggle);
+            SettingsTab.instance.Add(header: SettingsTab.instance.DefaultHeaders.Appearance_Hierarchy, callback: ShowHierarchyIconToggle());
 
         [RuntimeInitializeOnLoadMethod]
         [InitializeOnLoadMethod]
@@ -47,7 +47,7 @@ namespace plugin.asm.crossSceneReferences
         }
 
         static GUIStyle hierarchyIconStyle;
-        static bool OnSceneGUI(Rect position, scene scene, ref float width)
+        static bool OnSceneGUI(scene scene)
         {
 
             if (!Profile.current)
@@ -63,14 +63,14 @@ namespace plugin.asm.crossSceneReferences
             if (hierarchyIconStyle == null)
                 hierarchyIconStyle = new GUIStyle() { padding = new RectOffset(2, 2, 2, 2) };
 
-            _ = GUI.Button(position, new GUIContent(EditorGUIUtility.IconContent("orangeLight").image,
+            _ = GUILayout.Button(new GUIContent(EditorGUIUtility.IconContent("orangeLight").image,
                       "This scene contains cross-scene references that could not be resolved. New cross-scene referenses in this scene will not be saved."), hierarchyIconStyle);
 
             return true;
 
         }
 
-        static bool OnGameObjectGUI(Rect position, GameObject obj, ref float width)
+        static bool OnGameObjectGUI(GameObject obj)
         {
 
             if (!Profile.current)
@@ -88,7 +88,7 @@ namespace plugin.asm.crossSceneReferences
                 string.Join(Environment.NewLine,
                     references.Select(GetDisplayString));
 
-            _ = GUI.Button(position, new GUIContent(icon, tooltip), hierarchyIconStyle);
+            _ = GUILayout.Button(new GUIContent(icon, tooltip), hierarchyIconStyle);
 
             return true;
 
